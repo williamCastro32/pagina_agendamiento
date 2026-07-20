@@ -146,8 +146,9 @@ reservas se perderían en cada redespliegue.
 ../.venv/Scripts/python backend/manage.py test site_api
 ```
 
-21 tests cubren contenido, permisos, disponibilidad y las condiciones de carrera
-de la reserva (huecos expirados, doble pago, pago sobre hueco ya ocupado).
+25 tests cubren contenido, permisos, disponibilidad, el relleno de claves nuevas
+en instalaciones ya desplegadas, y las condiciones de carrera de la reserva
+(huecos expirados, doble pago, pago sobre hueco ya ocupado).
 
 ## Dónde vive cada texto
 
@@ -155,9 +156,9 @@ Equivocarse de sitio es la forma más común de editar el fichero incorrecto:
 
 | Dónde | Qué | Lo cambia |
 |---|---|---|
-| `SiteContent.data` (una fila JSON) | marca, nombre profesional, portada, servicios, testimonios, precio, handles, horarios | el dueño del sitio, desde Admin |
+| `SiteContent.data` (una fila JSON) | marca, nombre profesional, cómo se llama una sesión, portada, servicios, testimonios, trayectoria, cifras, precio, handles, horarios | el dueño del sitio, desde Admin |
 | `backend/site_api/default_content.py` | la semilla de esa fila, y el destino de «restaurar» | desarrollo |
-| `frontend/src/i18n.js` | botones, etiquetas, días de la semana, `MILESTONES`, `STATS` | desarrollo |
+| `frontend/src/i18n.js` | botones, etiquetas, días de la semana | desarrollo |
 
 ### Los marcadores de `i18n.js`
 
