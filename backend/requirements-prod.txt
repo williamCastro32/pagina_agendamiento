@@ -1,0 +1,8 @@
+# Producción (Railway) — el Dockerfile instala este fichero.
+# Añade sólo lo que el servidor necesita y en local no: el servidor WSGI y el
+# driver de PostgreSQL. En desarrollo `runserver` y SQLite cubren su papel.
+
+-r requirements.txt
+
+gunicorn==21.2.0
+psycopg2-binary==2.9.12

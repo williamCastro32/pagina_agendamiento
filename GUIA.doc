@@ -1,0 +1,546 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">
+<head>
+<meta charset="utf-8">
+<title>booking-site — Guía de ejecución local y despliegue en Railway</title>
+<style>
+  body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.45; color: #1a1a1a; margin: 2cm; }
+  h1 { font-family: 'Segoe UI Semibold', Calibri, sans-serif; font-size: 24pt; color: #0c1f37; border-bottom: 3px solid #c9a227; padding-bottom: 8px; margin-bottom: 4px; }
+  h2 { font-family: 'Segoe UI Semibold', Calibri, sans-serif; font-size: 16pt; color: #0c1f37; margin-top: 28px; border-bottom: 1px solid #d8dde3; padding-bottom: 4px; }
+  h3 { font-family: 'Segoe UI Semibold', Calibri, sans-serif; font-size: 12.5pt; color: #12253a; margin-top: 20px; margin-bottom: 6px; }
+  .sub { color: #55606d; font-size: 10.5pt; margin-top: 0; }
+  pre { background: #0c1f37; color: #eaf0f6; padding: 12px 14px; font-family: Consolas, 'Courier New', monospace; font-size: 9.5pt; line-height: 1.5; white-space: pre-wrap; }
+  code { font-family: Consolas, 'Courier New', monospace; font-size: 9.5pt; background: #eef1f5; padding: 1px 4px; }
+  pre code { background: none; padding: 0; color: inherit; font-size: 9.5pt; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 10pt; }
+  th { background: #0c1f37; color: #fff; text-align: left; padding: 7px 9px; font-weight: 600; }
+  td { border: 1px solid #d8dde3; padding: 7px 9px; vertical-align: top; }
+  tr:nth-child(even) td { background: #f6f8fa; }
+  .nota { border-left: 4px solid #c9a227; background: #fdf8e9; padding: 10px 14px; margin: 14px 0; }
+  .aviso { border-left: 4px solid #c0392b; background: #fdeeec; padding: 10px 14px; margin: 14px 0; }
+  .ok { border-left: 4px solid #1e8449; background: #eaf6ee; padding: 10px 14px; margin: 14px 0; }
+  ul, ol { margin-top: 6px; }
+  li { margin-bottom: 5px; }
+</style>
+</head>
+<body>
+
+<h1>booking-site</h1>
+<p class="sub">Guía de ejecución local y despliegue en Railway · actualizada el 20 de julio de 2026</p>
+
+<div class="nota">
+<strong>Esto es una plantilla que se revende.</strong> El código no nombra a ningún negocio,
+persona ni sector: todo lo específico de cada cliente se configura desde la pantalla
+<strong>Admin</strong>, sin tocar código ni recompilar.
+<br><br>
+Al montar un sitio nuevo, lo mínimo a rellenar en Admin es: <em>nombre de marca</em>,
+<em>nombre de quien atiende</em>, redes sociales, precio y horarios disponibles.
+<br><br>
+<strong>Regla al programar:</strong> si escribes el nombre de un cliente en
+<code>default_content.py</code> o en <code>i18n.js</code>, aparecerá en <em>todas</em> las
+instalaciones futuras. En el código sólo van marcadores; lo concreto va en Admin.
+</div>
+
+<h2>1. Qué es esta aplicación y por qué son dos cosas</h2>
+
+<p>El proyecto son <strong>dos programas distintos</strong> que se ejecutan por separado. Esta es la
+razón de que veas dos comandos diferentes y te resulte confuso:</p>
+
+<table>
+  <tr><th>Parte</th><th>Qué es</th><th>Cómo se arranca</th><th>Puerto</th></tr>
+  <tr>
+    <td><strong>Backend</strong><br><code>backend/</code></td>
+    <td>Django 5 + Django REST Framework. Guarda el contenido, las reservas y los usuarios.
+        Es quien habla con la base de datos.</td>
+    <td><code>manage.py runserver</code></td>
+    <td>8000</td>
+  </tr>
+  <tr>
+    <td><strong>Frontend</strong><br><code>frontend/</code></td>
+    <td>React compilado con Vite. Son las 7 pantallas que ve el visitante.
+        No sabe nada de la base de datos: le pregunta al backend por HTTP.</td>
+    <td><code>npm run dev</code></td>
+    <td>5173</td>
+  </tr>
+</table>
+
+<p><code>manage.py</code> es de Python y <code>npm run dev</code> es de Node. No son alternativas
+entre sí: <strong>en desarrollo tienen que estar los dos encendidos a la vez</strong>, cada uno en
+su propia terminal. Si sólo arrancas uno, la web carga pero no trae datos, o los datos existen
+pero no hay web que los enseñe.</p>
+
+<div class="nota">
+<strong>Por qué en local funcionan como si fuesen uno solo.</strong> El fichero
+<code>frontend/vite.config.js</code> tiene un <em>proxy</em>: cuando el navegador pide
+<code>/api/loquesea</code> al puerto 5173, Vite reenvía esa petición al 8000 sin que el navegador
+se entere. Por eso abres <strong>únicamente</strong> <code>http://localhost:5173</code> y nunca el
+8000, y por eso CORS no da problemas en desarrollo.
+</div>
+
+<h2>2. Requisitos previos</h2>
+
+<h3>Python: el entorno virtual es compartido</h3>
+
+<p>Este proyecto <strong>no tiene su propio <code>.venv</code></strong>. Usa el entorno compartido
+que está un nivel por encima, en <code>C:\Users\William\Desktop\proyectos\.venv</code>, junto al
+resto de proyectos de esa carpeta.</p>
+
+<p>No hace falta activarlo. Se llama al intérprete directamente por su ruta, que es lo que hacen
+todos los comandos de esta guía:</p>
+
+<pre><code>cd C:\Users\William\Desktop\proyectos\app_pagina_web
+..\.venv\Scripts\python --version
+# Python 3.12.10</code></pre>
+
+<div class="nota">
+<strong>Si VS Code te subraya los imports en rojo</strong> (<em>«Package Django is not installed»</em>)
+es que el editor está mirando a otro Python, no a que falte nada. Pulsa
+<code>Ctrl+Shift+P</code> → <em>Python: Select Interpreter</em> → <em>Enter interpreter path</em> →
+<code>C:\Users\William\Desktop\proyectos\.venv\Scripts\python.exe</code>.
+</div>
+
+<h3>Node.js</h3>
+<p>Necesario sólo para el frontend; no tiene nada que ver con el entorno de Python.
+En esta máquina hay Node 24.16 y npm 11.13, que sirven de sobra.</p>
+
+<h2>3. Los ficheros de requirements</h2>
+
+<p>Hay dos, y el de producción incluye al de local. Se separan porque el servidor necesita cosas
+que en tu portátil no pintan nada.</p>
+
+<table>
+  <tr><th>Fichero</th><th>Contiene</th><th>Quién lo usa</th></tr>
+  <tr>
+    <td><code>backend/requirements.txt</code></td>
+    <td>Django, DRF, SimpleJWT, corsheaders, python-decouple, <strong>dj-database-url</strong> y
+        <strong>whitenoise</strong>.</td>
+    <td>Desarrollo local. También es la base de producción.</td>
+  </tr>
+  <tr>
+    <td><code>backend/requirements-prod.txt</code></td>
+    <td><code>-r requirements.txt</code> más <strong>gunicorn</strong> y
+        <strong>psycopg2-binary</strong>.</td>
+    <td>El <code>Dockerfile</code> que construye Railway.</td>
+  </tr>
+</table>
+
+<p><code>dj-database-url</code> y <code>whitenoise</code> están en el fichero base, no en el de
+producción, por un motivo concreto: <code>settings.py</code> los importa siempre, también con
+<code>DEBUG=True</code>. Si estuvieran sólo en el de producción, la app no arrancaría en local.
+<code>gunicorn</code> y <code>psycopg2</code> sí son exclusivos del servidor, porque en local se
+usan <code>runserver</code> y SQLite.</p>
+
+<p>Todos ellos ya están instalados en el venv compartido, así que en esta máquina
+<strong>no tienes que instalar nada</strong>. El comando sería, si algún día hiciera falta:</p>
+
+<pre><code>..\.venv\Scripts\python -m pip install -r backend\requirements.txt</code></pre>
+
+<h2>4. Ejecutar la aplicación en local</h2>
+
+<h3>Preparación (sólo la primera vez)</h3>
+
+<pre><code>cd C:\Users\William\Desktop\proyectos\app_pagina_web
+
+# 1. Crear las tablas de la base de datos (SQLite, en backend\db.sqlite3)
+..\.venv\Scripts\python backend\manage.py migrate
+
+# 2. Crear el usuario con el que entrarás a la pantalla Admin
+..\.venv\Scripts\python backend\manage.py createsuperuser
+
+# 3. Descargar las dependencias de React
+npm install --prefix frontend</code></pre>
+
+<h3>El día a día: dos terminales</h3>
+
+<p><strong>Terminal 1 — backend:</strong></p>
+<pre><code>cd C:\Users\William\Desktop\proyectos\app_pagina_web
+..\.venv\Scripts\python backend\manage.py runserver</code></pre>
+
+<p><strong>Terminal 2 — frontend:</strong></p>
+<pre><code>cd C:\Users\William\Desktop\proyectos\app_pagina_web
+npm run dev --prefix frontend</code></pre>
+
+<div class="ok">
+<strong>Abre <code>http://localhost:5173</code></strong> y nada más. El puerto 8000 no se visita a
+mano: es al que Vite reenvía por detrás. La única excepción es
+<code>http://127.0.0.1:8000/django-admin/</code>, el panel propio de Django, que es distinto de la
+pantalla «Admin» de la web.
+</div>
+
+<h3>Comandos útiles</h3>
+
+<pre><code># Tests del backend: 18 pruebas de contenido, permisos y reservas
+..\.venv\Scripts\python backend\manage.py test site_api
+
+# Una sola clase o un solo caso
+..\.venv\Scripts\python backend\manage.py test site_api.tests.BookingTests
+
+# Compilar el frontend — es la única comprobación que existe de que no se ha roto
+npm run build --prefix frontend</code></pre>
+
+<p>No hay linter ni tests de frontend. <code>npm run build</code> es lo que detecta que el frontend
+está roto.</p>
+
+<h2>5. Variables de entorno y el fichero .env</h2>
+
+<p><code>backend/.env</code> guarda la configuración que cambia entre tu ordenador y el servidor.
+Está en <code>.gitignore</code>, así que <strong>nunca se sube al repositorio</strong>. Junto a él
+está <code>backend/.env.example</code>, que sí se sube y sirve de plantilla.</p>
+
+<p>Ya te he dejado creado un <code>backend/.env</code> listo para desarrollo, con su propia
+<code>SECRET_KEY</code> generada.</p>
+
+<table>
+  <tr><th>Variable</th><th>Para qué sirve</th><th>Local</th><th>Railway</th></tr>
+  <tr><td><code>SECRET_KEY</code></td><td>Con ella firma SimpleJWT los tokens. Mínimo 32 bytes.</td><td>La generada</td><td><strong>Otra distinta</strong></td></tr>
+  <tr><td><code>DEBUG</code></td><td>Páginas de error detalladas. En producción filtraría el código.</td><td><code>True</code></td><td><code>False</code></td></tr>
+  <tr><td><code>ALLOWED_HOSTS</code></td><td>Dominios a los que Django responde.</td><td><code>localhost,127.0.0.1</code></td><td>Automático</td></tr>
+  <tr><td><code>CSRF_TRUSTED_ORIGINS</code></td><td>Necesario para entrar al admin de Django tras un proxy HTTPS.</td><td>—</td><td>Automático</td></tr>
+  <tr><td><code>DATABASE_URL</code></td><td>Conexión a Postgres. Si no está, se usa SQLite.</td><td>Sin definir</td><td>La pone el plugin</td></tr>
+  <tr><td><code>TIME_ZONE</code></td><td>Zona horaria de las reservas.</td><td><code>Europe/Madrid</code></td><td>Igual</td></tr>
+  <tr><td><code>BOOKING_DAYS_AHEAD</code></td><td>Días de calendario que se ofrecen.</td><td><code>7</code></td><td><code>7</code></td></tr>
+  <tr><td><code>SECURE_HSTS_SECONDS</code></td><td>Obliga al navegador a usar sólo HTTPS. Ver aviso abajo.</td><td>—</td><td><code>0</code> (apagado)</td></tr>
+  <tr><td><code>DJANGO_SUPERUSER_USERNAME</code></td><td rowspan="3">Las lee <code>ensure_superuser</code> al arrancar el contenedor para crear el administrador. En local no se usan: ahí vale <code>createsuperuser</code>.</td><td>—</td><td>Tu usuario</td></tr>
+  <tr><td><code>DJANGO_SUPERUSER_PASSWORD</code></td><td>—</td><td>Bórrala tras el primer arranque</td></tr>
+  <tr><td><code>DJANGO_SUPERUSER_EMAIL</code></td><td>—</td><td>Tu correo</td></tr>
+</table>
+
+<div class="nota">
+<strong>HSTS está apagado a propósito.</strong> Con <code>SECURE_HSTS_SECONDS</code> activo, los
+navegadores memorizan que este dominio sólo se sirve por HTTPS y <em>se niegan</em> a usar HTTP
+durante todo ese plazo, aunque tú cambies de idea. Si algún día el certificado caduca en un
+dominio propio, la web queda inaccesible hasta que expire ese plazo en cada navegador. Merece la
+pena activarlo (<code>31536000</code>, un año) cuando el dominio definitivo lleve un tiempo
+funcionando sin sobresaltos, no el primer día.
+</div>
+
+<p>Para generar una <code>SECRET_KEY</code> nueva:</p>
+<pre><code>..\.venv\Scripts\python -c "import secrets; print(secrets.token_urlsafe(64))"</code></pre>
+
+<div class="aviso">
+<strong>La del <code>.env</code> local no vale para Railway.</strong> Genera una segunda y ponla
+como variable en el servidor. Si algún día ese <code>.env</code> se filtrara, la clave de
+producción seguiría siendo distinta.
+</div>
+
+<h2>6. Cómo cambia la aplicación al desplegarse</h2>
+
+<p>En local son dos servidores. En Railway va a ser <strong>uno solo</strong>: Django sirve la API
+<em>y también</em> el React ya compilado.</p>
+
+<pre><code>LOCAL                                  RAILWAY
+
+navegador → :5173  Vite (React)        navegador → tu-app.up.railway.app
+              ↓ proxy /api                          ↓
+           :8000  Django                         Django (gunicorn)
+              ↓                                     ├── /            → index.html
+           SQLite                                   ├── /assets/…    → JS y CSS
+                                                    ├── /api/…       → la API
+                                                    └── /django-admin/
+                                                          ↓
+                                                       PostgreSQL</code></pre>
+
+<p>Se ha elegido un único servicio en vez de dos por tres motivos concretos:</p>
+<ul>
+  <li><strong>No hay que tocar el código del frontend.</strong> <code>frontend/src/api.js</code>
+      llama a <code>/api</code> con ruta relativa. Al estar todo en el mismo dominio, sigue
+      funcionando tal cual. Con dos servicios habría que introducir una variable
+      <code>VITE_API_URL</code> y recompilar.</li>
+  <li><strong>CORS desaparece.</strong> Un solo origen, ninguna cabecera que ajustar.</li>
+  <li><strong>Cuesta la mitad.</strong> Un servicio en lugar de dos.</li>
+</ul>
+
+<h3>Qué se ha cambiado en el código</h3>
+
+<table>
+  <tr><th>Fichero</th><th>Cambio</th></tr>
+  <tr><td><code>backend/core/settings.py</code></td>
+      <td>Base de datos por <code>DATABASE_URL</code> con SQLite de reserva; WhiteNoise sirviendo
+          <code>frontend/dist</code>; <code>RAILWAY_PUBLIC_DOMAIN</code> añadido a
+          <code>ALLOWED_HOSTS</code> y <code>CSRF_TRUSTED_ORIGINS</code>; cookies seguras y
+          cabecera de proxy TLS cuando <code>DEBUG=False</code>.</td></tr>
+  <tr><td><code>Dockerfile</code></td>
+      <td>Nuevo. Dos etapas: Node compila el frontend, Python monta la imagen final. Node no acaba
+          en la imagen que se despliega.</td></tr>
+  <tr><td><code>railway.json</code></td>
+      <td>Nuevo. Le dice a Railway que use el Dockerfile, que compruebe la salud en
+          <code>/api/content/</code> y que reintente 3 veces si el arranque falla.</td></tr>
+  <tr><td><code>.dockerignore</code></td>
+      <td>Nuevo. Evita subir <code>node_modules</code>, el SQLite local y el <code>.env</code>.</td></tr>
+  <tr><td><code>backend/requirements-prod.txt</code></td>
+      <td>Nuevo. gunicorn y psycopg2 sobre la base común.</td></tr>
+</table>
+
+<div class="nota">
+<strong>Sobre el <code>Procfile</code>.</strong> No lo he creado a propósito. El
+<code>Procfile</code> sólo lo lee el constructor automático de Railway (Railpack); cuando hay un
+<code>Dockerfile</code>, Railway lo ignora por completo. Dejarlo ahí sería un fichero muerto que
+parece que manda pero no manda nada: el día que cambies el comando de arranque en el Procfile no
+pasaría nada y perderías la tarde buscando por qué. <strong>El arranque real está en la última
+línea del <code>Dockerfile</code></strong> (<code>migrate</code> seguido de <code>gunicorn</code>);
+ahí es donde hay que tocarlo.
+</div>
+
+<h2>7. El CLI de Railway</h2>
+
+<p>Instalado con npm:</p>
+
+<pre><code>npm install -g @railway/cli</code></pre>
+
+<div class="aviso">
+<strong>Está instalado pero Windows lo bloquea, y no hay arreglo cómodo.</strong> El paquete se
+instaló bien en <code>C:\Users\William\AppData\Roaming\npm</code>, pero al ejecutarlo Windows
+responde <em>«Una directiva de Control de aplicaciones bloqueó este archivo»</em>.
+<br><br>
+Diagnóstico exacto en esta máquina:
+<ul>
+  <li><strong>Smart App Control = 1 (ENFORCED).</strong> Está activo y aplicando la política.</li>
+  <li><strong><code>railway.exe</code> no está firmado</strong> (<code>NotSigned</code>).</li>
+  <li><strong>No tiene «marca de Internet»</strong> — sólo el flujo <code>:$DATA</code>. Esto
+      importa: significa que <code>Unblock-File</code> <em>no</em> sirve de nada, porque no hay
+      ninguna marca que quitar. El bloqueo es por falta de firma, no por procedencia.</li>
+</ul>
+</div>
+
+<div class="aviso">
+<strong>Corrección: Scoop no resuelve esto.</strong> En una versión anterior de esta guía lo
+sugerí como salida. Es falso: Scoop descarga <em>exactamente el mismo binario sin firmar</em>, así
+que Smart App Control lo bloqueará igual. Sólo cambia la carpeta donde se guarda, no la razón del
+bloqueo.
+</div>
+
+<p>Lo que queda realmente sobre la mesa:</p>
+
+<table>
+  <tr><th>Salida</th><th>Veredicto</th></tr>
+  <tr>
+    <td><strong>Desplegar desde GitHub, sin CLI</strong></td>
+    <td><strong>La recomendada.</strong> No sólo evita el problema: es mejor opción de todas formas,
+        porque cada <code>git push</code> despliega solo. El apartado 8 está escrito así.</td>
+  </tr>
+  <tr>
+    <td>Instalar WSL y el CLI dentro de Linux</td>
+    <td>Funciona — Smart App Control no gobierna dentro de WSL — pero aquí <strong>WSL no está
+        instalado</strong>. Es <code>wsl --install</code>, reiniciar, y montar un entorno entero
+        para una herramienta que no necesitas.</td>
+  </tr>
+  <tr>
+    <td>Desactivar Smart App Control</td>
+    <td><strong>No lo hagas por esto.</strong> Una vez apagado, <strong>no se puede volver a
+        encender sin reinstalar Windows</strong>. Es una pérdida permanente de protección en todo
+        el equipo a cambio de una comodidad puntual.</td>
+  </tr>
+</table>
+
+<div class="ok">
+<strong>Y ya no hace falta el CLI para nada.</strong> El único paso que lo pedía era crear el
+usuario administrador en el servidor. Ahora lo hace solo el propio contenedor al arrancar,
+mediante el comando <code>ensure_superuser</code> (ver apartado 8, paso 6). Puedes desinstalar el
+paquete si quieres: <code>npm uninstall -g @railway/cli</code>.
+</div>
+
+<h2>8. Desplegar en Railway</h2>
+
+<p>Todo por navegador y con <code>git</code>, que sí está instalado (versión 2.53). No hace falta el
+CLI de Railway ni <code>gh</code>.</p>
+
+<h3>Paso 1 — Identificarte ante Git</h3>
+
+<p>Git no tiene todavía nombre ni correo configurados en esta máquina, y sin eso
+<code>git commit</code> se niega a funcionar. Se hace una sola vez:</p>
+
+<pre><code>git config --global user.name "Tu Nombre"
+git config --global user.email "jekavelepe@gmail.com"</code></pre>
+
+<h3>Paso 2 — Convertir la carpeta en repositorio</h3>
+
+<pre><code>cd C:\Users\William\Desktop\proyectos\app_pagina_web
+git init
+git add .</code></pre>
+
+<div class="aviso">
+<strong>Antes de confirmar, comprueba que no sube ningún secreto.</strong> Ejecuta:
+<pre><code>git status</code></pre>
+En la lista <strong>no</strong> deben aparecer <code>backend/.env</code>,
+<code>backend/db.sqlite3</code>, <code>node_modules</code> ni <code>frontend/dist</code>.
+<code>.gitignore</code> ya los excluye, pero míralo con tus ojos: un <code>.env</code> subido a
+GitHub es una clave quemada, y borrarlo después no la borra del historial.
+</div>
+
+<pre><code>git commit -m "booking-site: aplicación y configuración de despliegue"
+git branch -M main</code></pre>
+
+<h3>Paso 3 — Crear el repositorio en GitHub y subirlo</h3>
+
+<ol>
+  <li>En <a href="https://github.com/new">github.com/new</a>: nombre <code>booking-site</code>,
+      visibilidad <strong>Private</strong>.</li>
+  <li><strong>No marques</strong> «Add a README», «Add .gitignore» ni licencia. Si creas ficheros
+      allí, el repositorio arranca con un commit que el tuyo no conoce y el <code>push</code>
+      es rechazado.</li>
+  <li><em>Create repository</em>, y luego:
+      <pre><code>git remote add origin https://github.com/TU-USUARIO/booking-site.git
+git push -u origin main</code></pre></li>
+</ol>
+
+<p>La primera vez se abrirá una ventana del navegador para autorizar a Git contra tu cuenta de
+GitHub. Es el flujo normal de Git Credential Manager, que ya viene con Git para Windows.</p>
+
+<h3>Paso 4 — Crear el proyecto en Railway</h3>
+
+<ol>
+  <li>Entra en <a href="https://railway.com">railway.com</a> y accede con tu cuenta de GitHub.</li>
+  <li><em>New Project</em> → <em>Deploy from GitHub repo</em>.</li>
+  <li>La primera vez pedirá instalar la app de Railway en tu cuenta de GitHub y darle acceso.
+      Puedes concedérselo <strong>sólo a este repositorio</strong>, que es lo prudente.</li>
+  <li>Elige <code>booking-site</code>.</li>
+</ol>
+
+<div class="nota">
+<strong>El primer despliegue va a fallar, y es lo esperado.</strong> Railway detecta el
+<code>Dockerfile</code> y construye la imagen bien, pero al arrancar el contenedor ejecuta
+<code>migrate</code> y todavía no existe base de datos ni <code>SECRET_KEY</code>. Se arregla en
+los pasos 5 y 6. No toques nada aún.
+</div>
+
+<h3>Paso 5 — Añadir PostgreSQL</h3>
+
+<p>Dentro del proyecto: <em>New</em> (o <em>Create</em>) → <em>Database</em> →
+<em>Add PostgreSQL</em>.</p>
+
+<p>Railway crea la base de datos y expone <code>DATABASE_URL</code>. <code>settings.py</code> la
+lee y cambia solo de SQLite a Postgres.</p>
+
+<div class="nota">
+<strong>Comprueba que el servicio de la app ve esa variable.</strong> En proyectos nuevos Railway
+la comparte automáticamente, pero conviene verificarlo: entra en el servicio de la app →
+<em>Variables</em>, y si <code>DATABASE_URL</code> no aparece, añádela con el valor de referencia
+<code>${{Postgres.DATABASE_URL}}</code> — esa sintaxis apunta al servicio de Postgres sin copiar
+la contraseña a mano. <strong>Si esto falla la app arranca igualmente, con SQLite, y perderías
+todas las reservas en cada redespliegue.</strong>
+</div>
+
+<h3>Paso 6 — Las variables de entorno</h3>
+
+<p>Servicio de la app → <em>Variables</em> → <em>New Variable</em>. Genera primero una
+<code>SECRET_KEY</code> nueva en tu terminal:</p>
+
+<pre><code>..\.venv\Scripts\python -c "import secrets; print(secrets.token_urlsafe(64))"</code></pre>
+
+<table>
+  <tr><th>Variable</th><th>Valor</th></tr>
+  <tr><td><code>SECRET_KEY</code></td><td>La recién generada — <strong>distinta</strong> de la del <code>.env</code> local</td></tr>
+  <tr><td><code>DEBUG</code></td><td><code>False</code></td></tr>
+  <tr><td><code>TIME_ZONE</code></td><td><code>Europe/Madrid</code></td></tr>
+  <tr><td><code>DJANGO_SUPERUSER_USERNAME</code></td><td>El usuario con el que entrarás a la pantalla Admin</td></tr>
+  <tr><td><code>DJANGO_SUPERUSER_PASSWORD</code></td><td>Una contraseña larga y que no uses en ningún otro sitio</td></tr>
+  <tr><td><code>DJANGO_SUPERUSER_EMAIL</code></td><td>Tu correo</td></tr>
+</table>
+
+<p>Las tres últimas las consume <code>ensure_superuser</code>, un comando propio que el contenedor
+ejecuta en cada arranque: si el usuario no existe lo crea, y si ya existe no hace nada. Esto
+sustituye al <code>createsuperuser</code> interactivo, que habría exigido el CLI bloqueado.</p>
+
+<div class="nota">
+<strong>Una vez hayas entrado y comprobado que funciona</strong>, borra
+<code>DJANGO_SUPERUSER_PASSWORD</code> de las variables. El usuario ya está en la base de datos y
+no hace falta seguir guardando la contraseña en claro en el panel. Cambiarla ahí después
+<em>no</em> cambia la del usuario: eso se hace desde <code>/django-admin/</code>.
+</div>
+
+<h3>Paso 7 — Generar el dominio</h3>
+
+<p>Servicio de la app → <em>Settings</em> → <em>Networking</em> → <em>Generate Domain</em>.
+Cuando pregunte el puerto, indica <strong>8000</strong> (es el que expone el
+<code>Dockerfile</code>).</p>
+
+<p>Obtendrás una URL <code>*.up.railway.app</code>. <strong>No hay que copiarla a ninguna
+variable</strong>: <code>settings.py</code> la lee sola de <code>RAILWAY_PUBLIC_DOMAIN</code> y la
+añade a <code>ALLOWED_HOSTS</code> y a <code>CSRF_TRUSTED_ORIGINS</code>.</p>
+
+<h3>Paso 8 — Redesplegar y mirar los logs</h3>
+
+<p>Pestaña <em>Deployments</em> → <em>Redeploy</em> en el último. En los logs debes ver, por este
+orden:</p>
+
+<pre><code>Running migrations:
+  Applying site_api.0001_initial... OK
+Created superuser 'tu-usuario'.
+[INFO] Starting gunicorn 21.2.0
+[INFO] Listening at: http://0.0.0.0:8000</code></pre>
+
+<p>Si aparece <code>Created superuser</code>, la base de datos es la de Postgres y todo encajó.
+A partir de aquí, cada <code>git push</code> a <code>main</code> despliega automáticamente.</p>
+
+<h2>9. Comprobar que ha salido bien</h2>
+
+<table>
+  <tr><th>URL</th><th>Debe mostrar</th></tr>
+  <tr><td><code>https://tu-app.up.railway.app/</code></td><td>La portada, con estilos y tipografías.</td></tr>
+  <tr><td><code>…/api/content/</code></td><td>Un JSON con el contenido del sitio.</td></tr>
+  <tr><td><code>…/api/availability/</code></td><td>Un JSON con los huecos libres.</td></tr>
+  <tr><td><code>…/django-admin/</code></td><td>El login de Django <strong>con estilos</strong>. Si sale sin CSS, falló <code>collectstatic</code>.</td></tr>
+  <tr><td>Pantalla «Admin» de la web</td><td>Debe aceptar el usuario del <code>createsuperuser</code> del servidor.</td></tr>
+</table>
+
+<p>Ya he verificado en local, con <code>DEBUG=False</code>, que las cuatro rutas responden 200 y
+que <code>collectstatic</code> procesa los 162 ficheros del admin sin errores. Lo que no se ha
+podido probar aquí es la construcción del Dockerfile, porque en esta máquina no hay Docker
+instalado; de eso se encarga Railway al desplegar.</p>
+
+<h2>10. Problemas frecuentes</h2>
+
+<table>
+  <tr><th>Síntoma</th><th>Causa y solución</th></tr>
+  <tr><td>La web carga pero sin datos, y la consola marca error en <code>/api/…</code></td>
+      <td>El backend no está arrancado. Faltó la Terminal 1.</td></tr>
+  <tr><td><code>DisallowedHost</code> en Railway</td>
+      <td>Estás entrando por un dominio propio que no está en <code>ALLOWED_HOSTS</code>. Añádelo como variable.</td></tr>
+  <tr><td>El admin de Django sale sin estilos</td>
+      <td><code>collectstatic</code> no corrió. Está en el <code>Dockerfile</code>: mira los logs del build.</td></tr>
+  <tr><td>«CSRF verification failed» al entrar al admin</td>
+      <td>Falta tu dominio propio en <code>CSRF_TRUSTED_ORIGINS</code> (con <code>https://</code> delante).</td></tr>
+  <tr><td>Las reservas desaparecen al redesplegar</td>
+      <td>El servicio está usando SQLite: el disco del contenedor es efímero. Comprueba que <code>DATABASE_URL</code> existe en las variables.</td></tr>
+  <tr><td>Cambio contenido en Admin y no se ve</td>
+      <td>El navegador cachea. <code>Ctrl+F5</code>.</td></tr>
+  <tr><td>El build tarda muchísimo</td>
+      <td>Falta el <code>.dockerignore</code> o está subiendo <code>node_modules</code>.</td></tr>
+  <tr><td><code>git commit</code> se queja de <em>«Please tell me who you are»</em></td>
+      <td>Falta el paso 1: <code>git config --global user.name</code> y <code>user.email</code>.</td></tr>
+  <tr><td><code>git push</code> rechazado: <em>«updates were rejected»</em></td>
+      <td>Creaste el repositorio en GitHub con README o .gitignore. Recupera ese commit con
+          <code>git pull --rebase origin main</code> y repite el push.</td></tr>
+  <tr><td>En los logs no aparece <code>Created superuser</code></td>
+      <td>Faltan <code>DJANGO_SUPERUSER_USERNAME</code> o <code>DJANGO_SUPERUSER_PASSWORD</code>.
+          El log lo dice: <em>«unset — skipping»</em>.</td></tr>
+  <tr><td>Entro al Admin de la web y rechaza mi usuario</td>
+      <td>Estás usando el usuario que creaste <strong>en local</strong>. Ese vive en tu SQLite y no
+          viaja al servidor: el del servidor es el de las variables <code>DJANGO_SUPERUSER_*</code>.</td></tr>
+  <tr><td>El despliegue se queda en <em>«healthcheck failed»</em></td>
+      <td>Gunicorn no llegó a arrancar, o el puerto del dominio no es 8000. Mira los logs: el error
+          real está por encima del healthcheck.</td></tr>
+</table>
+
+<h2>11. Lo que sigue sin estar resuelto</h2>
+
+<div class="aviso">
+<strong>El pago no es real y esto no cambia al desplegar.</strong>
+<code>/api/bookings/&lt;ref&gt;/pay/</code> se limita a marcar la reserva como pagada;
+<strong>no cobra nada</strong>. El formulario de tarjeta del paso 3 es decorativo: esos datos se
+quedan en el navegador y no llegan a ningún servidor. Es deliberado — recibir números de tarjeta
+en un servidor propio obliga a cumplir PCI DSS. Para cobrar de verdad hay que integrar Stripe
+Elements en el navegador y confirmar la reserva desde un webhook, no ampliar el endpoint actual.
+</div>
+
+<ul>
+  <li><strong>Correo y WhatsApp.</strong> La pantalla de confirmación los promete, pero todavía no
+      hay nada que los envíe.</li>
+  <li><strong>Copias de seguridad.</strong> Railway hace snapshots de Postgres, pero conviene
+      configurar y <em>probar</em> una restauración antes de que el sitio reciba reservas reales.</li>
+  <li><strong>El token de admin.</strong> Vive en <code>sessionStorage</code> y muere al cerrar la
+      pestaña. Ahora que API y web comparten dominio, pasarlo a una cookie <code>httpOnly</code>
+      sería más resistente a XSS.</li>
+</ul>
+
+</body>
+</html>

@@ -1,0 +1,25 @@
+# Fuera de la imagen. Sin esto `railway up` sube node_modules entero y el
+# build tarda muchísimo más.
+
+node_modules
+frontend/dist
+frontend/node_modules
+
+__pycache__/
+*.py[cod]
+.venv/
+
+# La base de datos local no debe pisar nada en el servidor.
+backend/db.sqlite3
+backend/staticfiles/
+
+# Los secretos llegan por variables de Railway, nunca dentro de la imagen.
+.env
+backend/.env
+
+.git
+.gitignore
+.claude
+*.md
+*.doc
+*.dc.html

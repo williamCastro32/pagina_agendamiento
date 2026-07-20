@@ -1,0 +1,31 @@
+node_modules
+dist
+.DS_Store
+Thumbs.db
+*.local
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Django
+backend/db.sqlite3
+backend/staticfiles/
+
+# Secrets. `.env` has no slash, so it matches at any depth (backend/.env too).
+# `.env.example` is NOT matched and stays tracked on purpose — it is the
+# template. Keep it that way: it must never hold a real value.
+.env
+.env.*
+!.env.example
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Claude Code: settings.local.json is per-machine (it holds this machine's
+# permission grants), so it does not belong in a repo that gets handed to
+# whoever buys the template.
+.claude/settings.local.json

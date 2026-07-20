@@ -1,0 +1,15 @@
+# Base — lo que settings.py importa siempre, en local y en producción.
+# Para desplegar usa requirements-prod.txt, que incluye este fichero.
+
+Django==5.2.16
+djangorestframework==3.14.0
+djangorestframework-simplejwt==5.5.1
+django-cors-headers==4.9.0
+python-decouple==3.8
+
+# settings.py los importa incondicionalmente, así que también hacen falta en
+# local aunque en desarrollo apenas trabajen:
+#   dj-database-url  lee DATABASE_URL y cae a SQLite si no está definida
+#   whitenoise       sirve los estáticos y la SPA compilada
+dj-database-url==3.1.2
+whitenoise==6.12.0
