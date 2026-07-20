@@ -17,14 +17,25 @@ SECRET_KEY = config(
     'SECRET_KEY',
     default='dev-only-insecure-key-change-me-before-deploying-anywhere',
 )
-DEBUG = config('DEBUG', default=True, cast=bool)
+# Set by Railway on every service. Used as "are we deployed?" so a buyer who
+# forgets to set DEBUG does not get a debug-mode site on a public URL.
+ON_RAILWAY = bool(config('RAILWAY_ENVIRONMENT', default=''))
+
+DEBUG = config('DEBUG', default=not ON_RAILWAY, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
 
-# Railway injects the generated domain here. Appending it means a fresh deploy
-# answers on its *.up.railway.app URL without anyone setting ALLOWED_HOSTS first.
+# Railway injects the generated domain here — but only once a domain exists.
 RAILWAY_DOMAIN = config('RAILWAY_PUBLIC_DOMAIN', default='')
 if RAILWAY_DOMAIN:
     ALLOWED_HOSTS.append(RAILWAY_DOMAIN)
+
+if ON_RAILWAY:
+    # The healthcheck runs *before* any domain is generated, and it does not
+    # arrive with the public Host header. Without these a first deploy fails
+    # with DisallowedHost and never becomes healthy — which is exactly what
+    # happened on the first attempt here. Leading dots are Django's
+    # subdomain-wildcard syntax.
+    ALLOWED_HOSTS += ['.up.railway.app', '.railway.app', '.railway.internal']
 
 # Django 4+ checks Origin against this on every unsafe request, so the Django
 # admin login fails behind Railway's TLS proxy without it.
@@ -132,7 +143,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # would otherwise redirect forever. These are no-ops when DEBUG is on.
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=True, cast=bool)
+
+    # Off by default on Railway, on by default anywhere else. Railway's edge
+    # already terminates TLS and serves the public URL over HTTPS, while its
+    # healthcheck reaches the container over plain HTTP *without*
+    # X-Forwarded-Proto. Redirecting here would 301 the healthcheck and the
+    # deploy would never go green.
+    SECURE_SSL_REDIRECT = config(
+        'SECURE_SSL_REDIRECT', default=not ON_RAILWAY, cast=bool
+    )
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
