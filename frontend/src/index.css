@@ -256,12 +256,61 @@ input:focus, textarea:focus { outline: none; border-color: var(--blue-600) !impo
 
 /* --------------------------------------------------------------------- hero */
 
+/* ---------------------------------------------------------------- stage ---
+   The backdrop the whole page scrolls over. Fixed, so the media keeps playing
+   behind later sections instead of leaving with the first fold; those sections
+   are opaque and cover it. z-index 0 with the app content at 1. */
+/* z-index -1, not 0. The sections are `position: static`, and a positioned
+   element at z-index 0 paints *above* static siblings — at 0 this layer covered
+   the whole page instead of sitting behind it. Negative keeps it inside main's
+   stacking context but below the content. */
+.stage {
+  position: fixed; inset: 0; z-index: -1; overflow: hidden;
+  background: var(--navy-900); pointer-events: none;
+}
+.stage__media { position: absolute; inset: -6% -2%; will-change: transform; }
+.stage__video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.stage__scrim {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(120% 90% at 20% 15%, rgba(12, 31, 55, .15), transparent 60%),
+    linear-gradient(180deg, rgba(12, 31, 55, .35) 0%, rgba(12, 31, 55, .78) 100%);
+  transition: opacity .25s linear;
+}
+/* Breaks up the banding that big flat gradients show on cheap panels. */
+.stage__grain {
+  position: absolute; inset: 0; opacity: .16; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+}
+
+/* Lifts the page content above the stage. Deliberately not `.nav` too: that is
+   already fixed at z-index 60, and overriding it here dropped it out of the
+   viewport entirely. */
+.app > main { position: relative; z-index: 1; }
+
+/* --------------------------------------------------------------- reveal --- */
+.reveal {
+  opacity: 0; transform: translate3d(0, 28px, 0);
+  transition: opacity .7s cubic-bezier(.22, .61, .36, 1),
+              transform .7s cubic-bezier(.22, .61, .36, 1);
+}
+.reveal--in { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .stage__media { transform: none !important; }
+}
+
 .hero {
-  position: relative; min-height: 100svh; background: var(--navy-900);
-  overflow: hidden; display: flex; flex-direction: column; justify-content: center;
+  position: relative; min-height: 100svh; background: transparent;
+  display: flex; flex-direction: column; justify-content: center;
   padding: 120px clamp(20px, 6vw, 72px) 70px;
 }
-.hero__veil { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(12, 31, 55, .25), rgba(12, 31, 55, .6)); }
+/* The stage supplies the scrim now; this stays as a local lift under the copy. */
+.hero__veil {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, transparent 40%, rgba(12, 31, 55, .55) 100%);
+}
 .hero__content { position: relative; z-index: 2; max-width: 1240px; margin: 0 auto; width: 100%; }
 
 .hero__kicker {

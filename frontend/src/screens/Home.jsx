@@ -1,4 +1,6 @@
-import Mesh, { CTA_MESH, HERO_MESH } from '../components/Mesh'
+import Mesh, { CTA_MESH } from '../components/Mesh'
+import Reveal from '../components/Reveal'
+import ScrollStage from '../components/ScrollStage'
 
 const SPARKS = [
   { top: '20%', left: '15%', size: 5, background: '#d4a13d', animation: 'drift 6s ease-in-out infinite' },
@@ -18,9 +20,12 @@ export default function Home({ content, ct, L, lang, onNavigate, onOpenVideo }) 
 
   return (
     <>
+      {/* The fixed backdrop. Rendered here, not in App, so it unmounts with
+          the screen — the other screens are light and want no video behind. */}
+      <ScrollStage videoUrl={content.videoUrl} />
+
       {/* ---------------------------------------------------------- hero */}
       <section className="hero">
-        <Mesh layers={HERO_MESH} />
         <div className="hero__veil" aria-hidden="true" />
         {SPARKS.map((s, i) => (
           <span
@@ -35,10 +40,10 @@ export default function Home({ content, ct, L, lang, onNavigate, onOpenVideo }) 
         ))}
 
         <div className="hero__content">
-          <span className="hero__kicker">{ct.heroKicker}</span>
-          <h1 className="hero__title">{ct.heroTitle}</h1>
-          <p className="hero__subtitle">{ct.heroSubtitle}</p>
-          <div className="hero__actions">
+          <Reveal as="span" className="hero__kicker">{ct.heroKicker}</Reveal>
+          <Reveal as="h1" className="hero__title" delay={90}>{ct.heroTitle}</Reveal>
+          <Reveal as="p" className="hero__subtitle" delay={180}>{ct.heroSubtitle}</Reveal>
+          <Reveal className="hero__actions" delay={270}>
             <button className="btn btn--primary btn--lg" onClick={() => onNavigate('booking')}>
               {L.ctaAgendar} →
             </button>
@@ -48,7 +53,7 @@ export default function Home({ content, ct, L, lang, onNavigate, onOpenVideo }) 
               </span>
               {L.playVideo}
             </button>
-          </div>
+          </Reveal>
         </div>
         <div className="hero__scroll" aria-hidden="true">{L.scroll}</div>
       </section>
