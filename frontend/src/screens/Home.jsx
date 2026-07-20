@@ -1,14 +1,17 @@
+import { useRef } from 'react'
 import Mesh, { CTA_MESH } from '../components/Mesh'
 import Reveal from '../components/Reveal'
 import ScrollStage from '../components/ScrollStage'
-
-const SPARKS = [
-  { top: '20%', left: '15%', size: 5, background: '#d4a13d', animation: 'drift 6s ease-in-out infinite' },
-  { top: '30%', left: '82%', size: 4, background: '#eef2f6', animation: 'drift 8s ease-in-out infinite 1s' },
-  { top: '64%', left: '40%', size: 3, background: '#eef2f6', animation: 'shimmer 3s ease-in-out infinite' },
-]
+import { HeroControls, HeroPhrases, useHeroReel, useVideoSync } from '../components/HeroReel'
 
 export default function Home({ content, ct, L, lang, onNavigate, onOpenVideo }) {
+  // Older installs predate heroPhrases; fall back to the single headline so a
+  // site that has not been through backfill still renders a hero.
+  const phrases = ct.heroPhrases?.length ? ct.heroPhrases : [ct.heroTitle]
+  const reel = useHeroReel(phrases.length)
+  const videoRef = useRef(null)
+  useVideoSync(videoRef, reel.paused)
+
   const services = ct.services.map((s, i) => ({
     ...s,
     cardBg: content.cardBgs[i % content.cardBgs.length],
@@ -22,28 +25,18 @@ export default function Home({ content, ct, L, lang, onNavigate, onOpenVideo }) 
     <>
       {/* The fixed backdrop. Rendered here, not in App, so it unmounts with
           the screen — the other screens are light and want no video behind. */}
-      <ScrollStage videoUrl={content.videoUrl} />
+      <ScrollStage videoUrl={content.videoUrl} paused={reel.paused} videoRef={videoRef} />
 
-      {/* ---------------------------------------------------------- hero */}
-      <section className="hero">
+      {/* ---------------------------------------------------------- hero
+          The reel is the whole first screen: media edge to edge, one line of
+          type centred on it, and nothing else competing. */}
+      <section className="hero hero--reel">
         <div className="hero__veil" aria-hidden="true" />
-        {SPARKS.map((s, i) => (
-          <span
-            key={i}
-            className="spark"
-            aria-hidden="true"
-            style={{
-              top: s.top, left: s.left, width: s.size, height: s.size,
-              background: s.background, animation: s.animation,
-            }}
-          />
-        ))}
 
-        <div className="hero__content">
-          <Reveal as="span" className="hero__kicker">{ct.heroKicker}</Reveal>
-          <Reveal as="h1" className="hero__title" delay={90}>{ct.heroTitle}</Reveal>
-          <Reveal as="p" className="hero__subtitle" delay={180}>{ct.heroSubtitle}</Reveal>
-          <Reveal className="hero__actions" delay={270}>
+        <div className="reel">
+          <HeroPhrases phrases={phrases} index={reel.index} />
+          <p className="reel__sub">{ct.heroSubtitle}</p>
+          <div className="reel__actions">
             <button className="btn btn--primary btn--lg" onClick={() => onNavigate('booking')}>
               {L.ctaAgendar} →
             </button>
@@ -53,9 +46,17 @@ export default function Home({ content, ct, L, lang, onNavigate, onOpenVideo }) 
               </span>
               {L.playVideo}
             </button>
-          </Reveal>
+          </div>
         </div>
-        <div className="hero__scroll" aria-hidden="true">{L.scroll}</div>
+
+        <HeroControls
+          phrases={phrases}
+          index={reel.index}
+          paused={reel.paused}
+          onToggle={reel.toggle}
+          onGoTo={reel.goTo}
+          labels={{ play: L.reelPlay, pause: L.reelPause }}
+        />
       </section>
 
       {/* ----------------------------------------------------- statement */}

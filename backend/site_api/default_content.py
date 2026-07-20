@@ -48,6 +48,14 @@ DEFAULT_CONTENT = {
             'sessionLabel': 'videollamada',
             'heroKicker': 'SESIONES PRIVADAS · POR VIDEOLLAMADA',
             'heroTitle': 'Tu camino\ntiene guía',
+            # Se turnan sobre el video del hero. Son una secuencia real
+            # (reconocer -> imaginar -> decidir), y por eso los marcadores de
+            # progreso significan algo en lugar de decorar.
+            'heroPhrases': [
+                'Tu camino tiene guía',
+                'Una hora, solo para ti',
+                'Reserva cuando estés listo',
+            ],
             'heroSubtitle': (
                 'Sesiones personales, uno a uno. Reserva tu espacio y hablemos '
                 'con calma en una videollamada privada, solo para ti.'
@@ -81,6 +89,11 @@ DEFAULT_CONTENT = {
             'sessionLabel': 'video call',
             'heroKicker': 'PRIVATE SESSIONS · BY VIDEO CALL',
             'heroTitle': 'Your path\nhas a guide',
+            'heroPhrases': [
+                'Your path has a guide',
+                'One hour, only yours',
+                'Book when you are ready',
+            ],
             'heroSubtitle': (
                 'Personal one-to-one sessions. Book your slot and let us talk '
                 'unhurried, in a private video call meant only for you.'

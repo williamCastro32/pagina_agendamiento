@@ -42,7 +42,7 @@ class SiteContentSerializer(serializers.ModelSerializer):
             for key in ('heroKicker', 'heroTitle', 'heroSubtitle', 'sessionLabel'):
                 if not isinstance(block.get(key), str):
                     raise serializers.ValidationError(f'"{lang}.{key}" must be a string.')
-            for key in ('services', 'testimonials', 'milestones', 'stats'):
+            for key in ('services', 'testimonials', 'milestones', 'stats', 'heroPhrases'):
                 if not isinstance(block.get(key), list):
                     raise serializers.ValidationError(f'"{lang}.{key}" must be a list.')
 

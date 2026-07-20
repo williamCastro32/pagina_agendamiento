@@ -12,7 +12,7 @@ import Mesh, { HERO_MESH } from './Mesh'
  * common case, not an edge case — videoUrl ships empty and many buyers never
  * set one, so the fallback has to look deliberate rather than broken.
  */
-export default function ScrollStage({ videoUrl }) {
+export default function ScrollStage({ videoUrl, paused = false, videoRef }) {
   const [progress, setProgress] = useState(0)
   const frame = useRef(0)
 
@@ -47,6 +47,7 @@ export default function ScrollStage({ videoUrl }) {
       >
         {videoUrl ? (
           <video
+            ref={videoRef}
             className="stage__video"
             src={videoUrl}
             autoPlay
@@ -60,7 +61,7 @@ export default function ScrollStage({ videoUrl }) {
           <Mesh layers={HERO_MESH} />
         )}
       </div>
-      <div className="stage__scrim" style={{ opacity: 0.35 + progress * 0.45 }} />
+      <div className="stage__scrim" style={{ opacity: 0.18 + progress * 0.5 }} />
       <div className="stage__grain" />
     </div>
   )
