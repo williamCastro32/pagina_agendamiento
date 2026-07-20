@@ -174,14 +174,6 @@ export default function Home({ content, ct, L, lang, onNavigate, onOpenVideo }) 
           </button>
         </div>
 
-        <footer className="footer">
-          <span className="footer__copy">© 2026 {content.brandName}</span>
-          <div className="footer__links">
-            <button className="footer__link" onClick={() => onNavigate('social')}>Instagram</button>
-            <button className="footer__link" onClick={() => onNavigate('social')}>TikTok</button>
-            <button className="footer__link" onClick={() => onNavigate('admin')}>Admin</button>
-          </div>
-        </footer>
       </section>
     </>
   )

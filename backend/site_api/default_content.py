@@ -22,16 +22,21 @@ DEFAULT_CONTENT = {
     'igFollowers': '24.5K',
     'ttHandle': '@tumarca',
     'ttFollowers': '41.2K',
+    # Part of the palette lives here rather than in CSS, because the owner can
+    # restyle these from Admin. Consequence worth knowing: changing the CSS
+    # tokens does NOT restyle an existing site — backfill only adds missing
+    # keys, it never overwrites. An already-live install needs "reset content"
+    # or a manual edit to pick these up.
     'cardBgs': [
-        'linear-gradient(150deg,#2a5891,#16345a)',
-        'linear-gradient(150deg,#a4302a,#6e1f1a)',
-        'linear-gradient(150deg,#d4a13d,#a5761f)',
-        'linear-gradient(150deg,#12253a,#1f3a58)',
+        'linear-gradient(150deg,#4f46e5,#2a1f9e)',
+        'linear-gradient(150deg,#e5484d,#8f1d24)',
+        'linear-gradient(150deg,#22d3ee,#0e7490)',
+        'linear-gradient(150deg,#f5b944,#a9660d)',
     ],
     'avatarBgs': [
-        'linear-gradient(135deg,#2a5891,#3a6ea8)',
-        'linear-gradient(135deg,#a4302a,#c94a35)',
-        'linear-gradient(135deg,#d4a13d,#e8bd5f)',
+        'linear-gradient(135deg,#4f46e5,#6d64f0)',
+        'linear-gradient(135deg,#22d3ee,#3b82f6)',
+        'linear-gradient(135deg,#f5b944,#ffd37c)',
     ],
     'slots': [
         {'value': '9:00', 'enabled': True},
@@ -80,9 +85,9 @@ DEFAULT_CONTENT = {
             # 'color' is a design token, not copy: Admin lets the owner edit the
             # figure and its label, and leaves the colour alone.
             'stats': [
-                {'value': '10+', 'label': 'años de experiencia', 'color': '#a4302a'},
-                {'value': '1 a 1', 'label': 'sesiones privadas, sin salas grupales', 'color': '#2a5891'},
-                {'value': '65K+', 'label': 'personas en la comunidad', 'color': '#d4a13d'},
+                {'value': '10+', 'label': 'años de experiencia', 'color': '#e5484d'},
+                {'value': '1 a 1', 'label': 'sesiones privadas, sin salas grupales', 'color': '#4f46e5'},
+                {'value': '65K+', 'label': 'personas en la comunidad', 'color': '#f5b944'},
             ],
         },
         'en': {
@@ -116,9 +121,9 @@ DEFAULT_CONTENT = {
                 {'year': '2024', 'title': 'Digital community', 'desc': 'The work reaches thousands through social media.'},
             ],
             'stats': [
-                {'value': '10+', 'label': 'years of experience', 'color': '#a4302a'},
-                {'value': '1-on-1', 'label': 'private sessions, never group rooms', 'color': '#2a5891'},
-                {'value': '65K+', 'label': 'people in the community', 'color': '#d4a13d'},
+                {'value': '10+', 'label': 'years of experience', 'color': '#e5484d'},
+                {'value': '1-on-1', 'label': 'private sessions, never group rooms', 'color': '#4f46e5'},
+                {'value': '65K+', 'label': 'people in the community', 'color': '#f5b944'},
             ],
         },
     },

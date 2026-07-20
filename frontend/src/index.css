@@ -5,36 +5,43 @@
    ========================================================================== */
 
 :root {
-  /* Brand */
-  --navy-900: #0c1f37;
-  --navy-800: #12253a;
-  --navy-700: #16345a;
-  --blue-600: #2a5891;
-  --blue-500: #3a6ea8;
-  --gold: #d4a13d;
-  --gold-light: #e8bd5f;
-  --red: #a4302a;
+  /* Brand.
+     The old palette was muted navy + antique gold on parchment — dignified but
+     muddy, and every colour sat around 40% saturation so nothing ever felt lit.
+     This set keeps the same roles but pushes the darks colder and deeper and
+     the accents genuinely saturated, so the video hero has something to sit on
+     and the buttons read as interactive rather than printed. */
+  --navy-900: #070b18;
+  --navy-800: #0d1226;
+  --navy-700: #161d3d;
+  --blue-600: #4f46e5;
+  --blue-500: #6d64f0;
+  --cyan: #22d3ee;
+  --gold: #f5b944;
+  --gold-light: #ffd37c;
+  --red: #e5484d;
 
-  /* Surfaces */
-  --cream: #f6f1e6;
-  --sand: #f4efe4;
-  --ice: #eef3f8;
-  --paper: #fffdf8;
-  --ink-900: #12253a;
-  --ink-700: #2c3a49;
-  --ink-600: #3a4a5a;
-  --ink-500: #4d5f70;
-  --ink-400: #7189a3;
+  /* Surfaces. Cooled from parchment to a neutral near-white: the warm cream
+     fought the blues and made mid-tones look dusty. */
+  --cream: #f7f8fc;
+  --sand: #f1f3fa;
+  --ice: #e8edf9;
+  --paper: #ffffff;
+  --ink-900: #0d1226;
+  --ink-700: #232b45;
+  --ink-600: #333c58;
+  --ink-500: #4a5470;
+  --ink-400: #6f7a99;
 
   /* On dark */
-  --dim-100: #c3d1e0;
-  --dim-200: #b8c9db;
-  --dim-300: #9db3c9;
-  --dim-400: #8ba0b6;
+  --dim-100: #d3d9ec;
+  --dim-200: #c2cae3;
+  --dim-300: #a3aed0;
+  --dim-400: #8b96bd;
 
   /* Admin surfaces */
-  --admin-bg: #0f1620;
-  --admin-card: #182230;
+  --admin-bg: #0a0e1c;
+  --admin-card: #141b31;
 
   --grad-blue: linear-gradient(90deg, var(--blue-600), var(--blue-500));
   --grad-deep: linear-gradient(160deg, var(--navy-700), var(--navy-900));
@@ -288,6 +295,51 @@ input:focus, textarea:focus { outline: none; border-color: var(--blue-600) !impo
    viewport entirely. */
 .app > main { position: relative; z-index: 1; }
 
+/* --------------------------------------------------------------- footer --- */
+.footer {
+  position: relative; z-index: 1;
+  background: var(--navy-900); color: var(--dim-200);
+  border-top: 1px solid rgba(211, 217, 236, .12);
+  padding: clamp(40px, 6vw, 64px) clamp(20px, 6vw, 72px) clamp(28px, 4vw, 40px);
+}
+.footer__inner { max-width: 1240px; margin: 0 auto; display: grid; gap: 26px; }
+.footer__brand { display: flex; align-items: center; gap: 11px; }
+.footer__mark {
+  width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+  border: 1px solid var(--gold); color: var(--gold);
+  font: 700 13px var(--font-display);
+}
+.footer__name { font: 700 14px var(--font-display); letter-spacing: 1.5px; color: var(--cream); }
+
+.footer__links { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.footer__link {
+  background: none; border: 0; cursor: pointer; padding: 4px 0;
+  font: 500 14px var(--font-body); color: var(--dim-200);
+  transition: color .2s;
+}
+.footer__link:hover { color: var(--cream); }
+
+.footer__meta {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  padding-top: 20px; border-top: 1px solid rgba(211, 217, 236, .1);
+  font: 400 12.5px var(--font-body); color: var(--dim-400);
+}
+.footer__dot { opacity: .5; }
+.footer__credit { color: var(--dim-300); text-decoration: none; transition: color .2s; }
+.footer__credit:hover { color: var(--gold-light); text-decoration: underline; }
+
+/* Quiet, and last in the row — but still a real, reachable control. */
+.footer__admin {
+  margin-left: auto; background: none; border: 0; cursor: pointer;
+  font: 400 12.5px var(--font-body); color: var(--dim-400);
+  padding: 4px 0; transition: color .2s;
+}
+.footer__admin:hover { color: var(--dim-100); }
+
+@media (max-width: 560px) {
+  .footer__admin { margin-left: 0; }
+}
+
 /* --------------------------------------------------------------- reveal --- */
 .reveal {
   opacity: 0; transform: translate3d(0, 28px, 0);
@@ -535,16 +587,9 @@ input:focus, textarea:focus { outline: none; border-color: var(--blue-600) !impo
   font: 800 clamp(32px, 6.5vw, 76px)/1.02 var(--font-display);
   letter-spacing: -2px; color: var(--cream); margin: 0 0 26px; text-wrap: balance;
 }
-.footer {
-  position: relative; z-index: 2; margin: 80px auto 0; padding-top: 26px;
-  border-top: 1px solid rgba(212, 161, 61, .18);
-  display: flex; justify-content: space-between; align-items: center;
-  flex-wrap: wrap; gap: 14px; max-width: 1240px;
-}
-.footer__copy { font: 500 12px var(--font-body); color: var(--dim-400); }
-.footer__links { display: flex; gap: 20px; align-items: center; }
-.footer__link { border: none; background: none; font: 500 12.5px var(--font-body); color: #a9bcce; cursor: pointer; }
-.footer__link:hover { color: var(--cream); }
+/* The old inline footer that lived inside the Home CTA was removed along with
+   its markup. Its rules sat *below* the real footer's and silently won the
+   cascade for .footer, .footer__links and .footer__link. */
 
 .panel-cta {
   position: relative; overflow: hidden; background: var(--grad-deep);

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from './api'
 import { getUI } from './i18n'
+import Footer from './components/Footer'
 import Nav from './components/Nav'
 import VideoModal from './components/VideoModal'
 import Home from './screens/Home'
@@ -100,6 +101,10 @@ export default function App() {
         {screen === 'confirmation' && <Confirmation {...shared} booking={lastBooking} />}
         {screen === 'admin' && <Admin L={L} content={content} onContentChange={setContent} onNavigate={navigate} />}
       </main>
+
+      {/* Not on the Admin screen: it has its own chrome, and a footer whose
+          only distinctive link points back to Admin would be circular. */}
+      {screen !== 'admin' && <Footer content={content} L={L} onNavigate={navigate} />}
     </div>
   )
 }

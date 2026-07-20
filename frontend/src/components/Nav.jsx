@@ -31,9 +31,9 @@ export default function Nav({ brandName, screen, lang, L, onNavigate, onSetLang,
           <button className="pill pill--cta" onClick={() => onNavigate('booking')}>
             {L.navAgendar}
           </button>
-          <button className="pill pill--admin" onClick={() => onNavigate('admin')}>
-            ⚙ Admin
-          </button>
+          {/* Admin used to sit here. It is the owner's door, not a visitor's,
+              and putting it in the primary nav advertised it to everyone. It
+              now lives in the footer. */}
 
           <div className="lang">
             {LANGS.map((code) => (
