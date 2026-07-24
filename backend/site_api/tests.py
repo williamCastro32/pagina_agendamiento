@@ -61,6 +61,22 @@ class ContentApiTests(TestCase):
         # Persisted, not just patched in memory.
         self.assertIn('professionalName', SiteContent.objects.get(id=1).data)
 
+    def test_load_backfills_the_background_video(self):
+        """The live site fixes itself on first read — no Admin step needed.
+
+        backgroundVideoUrl shipped after production's row was written, so the
+        whole fix depends on backfill adding it. videoUrl is left alone on
+        purpose: it exists holding '', which means "not set yet", not "missing".
+        """
+        content = SiteContent.load()
+        del content.data['backgroundVideoUrl']
+        content.data['videoUrl'] = ''
+        content.save()
+
+        reloaded = SiteContent.load().data
+        self.assertEqual(reloaded['backgroundVideoUrl'], '/hero.mp4')
+        self.assertEqual(reloaded['videoUrl'], '')
+
     def test_load_backfills_keys_inside_a_language_block(self):
         """Timeline and figures moved into content after sites were live."""
         content = SiteContent.load()

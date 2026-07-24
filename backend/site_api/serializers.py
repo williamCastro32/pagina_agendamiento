@@ -21,7 +21,7 @@ class SiteContentSerializer(serializers.ModelSerializer):
         # professionalName is substituted into the UI copy wherever {name}
         # appears, so a non-string here would surface as "[object Object]"
         # across half the site.
-        for key in ('brandName', 'professionalName'):
+        for key in ('brandName', 'professionalName', 'videoUrl', 'backgroundVideoUrl'):
             if not isinstance(value.get(key), str):
                 raise serializers.ValidationError(f'"{key}" must be a string.')
 

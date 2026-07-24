@@ -17,6 +17,15 @@ DEFAULT_CONTENT = {
     'professionalName': 'Nombre Apellido',
     'videoPrice': '$60 USD',
     'videoDuration': '50 min',
+    # Two videos, two jobs — they want opposite things:
+    #   backgroundVideoUrl  the hero backdrop. Short, silent, loops, never has
+    #                       controls. Ships with the template.
+    #   videoUrl            the owner's actual intro, opened by "play". Has a
+    #                       voice and controls, and is as long as it needs to be.
+    # The relative path is deliberate: WhiteNoise serves frontend/dist at the
+    # site root, so /hero.mp4 resolves in development and in production without
+    # anyone configuring a domain or a CDN.
+    'backgroundVideoUrl': '/hero.mp4',
     'videoUrl': '',
     'igHandle': '@tumarca',
     'igFollowers': '24.5K',

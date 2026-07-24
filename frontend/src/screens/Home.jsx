@@ -25,7 +25,11 @@ export default function Home({ content, ct, L, lang, onNavigate, onOpenVideo }) 
     <>
       {/* The fixed backdrop. Rendered here, not in App, so it unmounts with
           the screen — the other screens are light and want no video behind. */}
-      <ScrollStage videoUrl={content.videoUrl} paused={reel.paused} videoRef={videoRef} />
+      <ScrollStage
+        videoUrl={content.backgroundVideoUrl}
+        paused={reel.paused}
+        videoRef={videoRef}
+      />
 
       {/* ---------------------------------------------------------- hero
           The reel is the whole first screen: media edge to edge, one line of

@@ -253,6 +253,14 @@ export default function Admin({ L, content, onContentChange, onNavigate }) {
             </div>
           </div>
           <div style={{ marginTop: 16 }}>
+            <label className="admin-label" htmlFor="a-bgvideo">{L.fBackgroundVideoUrl}</label>
+            <input
+              id="a-bgvideo" className="admin-input" value={draft.backgroundVideoUrl ?? ''}
+              placeholder="/hero.mp4"
+              onChange={(e) => setField('backgroundVideoUrl', e.target.value)}
+            />
+          </div>
+          <div style={{ marginTop: 16 }}>
             <label className="admin-label" htmlFor="a-video">{L.fVideoUrl}</label>
             <input
               id="a-video" className="admin-input" value={draft.videoUrl}
